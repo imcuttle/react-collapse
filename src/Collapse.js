@@ -1,4 +1,4 @@
-/* eslint-disable react/no-did-update-set-state,react/no-did-mount-set-state */
+/* eslint-disable react/no-did-update-set-state,react/no-did-mount-set-state,no-plusplus */
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Motion, spring} from 'react-motion';
@@ -68,7 +68,7 @@ export class Collapse extends React.PureComponent {
     if (isOpened) {
       const to = this.getTo();
       if (forceInitialAnimation) {
-        const from = this.wrapper.clientHeight;
+        const from = this.wrapperHeight;
         this.setState({currentState: RESIZING, from, to});
       } else {
         this.setState({currentState: IDLING, from: to, to});
@@ -93,7 +93,6 @@ export class Collapse extends React.PureComponent {
     }
   }
 
-
   componentDidUpdate(_, prevState) {
     const {isOpened, onRest, onMeasure} = this.props;
 
@@ -106,7 +105,7 @@ export class Collapse extends React.PureComponent {
       onMeasure({height: this.state.to, width: this.content.clientWidth});
     }
 
-    const from = this.wrapper.clientHeight;
+    const from = this.wrapperHeight;
     const to = isOpened ? this.getTo() : 0;
 
     if (from !== to) {
@@ -139,6 +138,10 @@ export class Collapse extends React.PureComponent {
     this.raf = requestAnimationFrame(this.setResting);
   };
 
+  get wrapperHeight() {
+    return this.wrapper.clientHeight;
+  }
+
 
   setResting = () => {
     this.setState({currentState: RESTING});
@@ -147,8 +150,26 @@ export class Collapse extends React.PureComponent {
 
   getTo = () => {
     const {fixedHeight} = this.props;
-    return (fixedHeight > -1) ? fixedHeight : this.content.clientHeight;
+    return (fixedHeight > -1) ? fixedHeight : this.content.clientHeight + this.getMarginHeight();
   };
+
+  getMarginHeight() {
+    const {children} = this.content;
+    let sumMarginHeight = 0;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      let marginHeight = 0;
+      if (child.computedStyleMap) {
+        const map = child.computedStyleMap();
+        marginHeight += map.get('margin-top').value + map.get('margin-bottom').value;
+      } else if (global.getComputedStyle) {
+        const map = global.getComputedStyle(child);
+        marginHeight += parseFloat(map.marginTop) + parseFloat(map.marginBottom);
+      }
+      sumMarginHeight += marginHeight;
+    }
+    return sumMarginHeight;
+  }
 
 
   getWrapperStyle = height => {

@@ -12,6 +12,7 @@ import {Issue40} from './Issue40';
 import {Issue59} from './Issue59';
 import {Issue66} from './Issue66';
 import {Issue163} from './Issue163';
+import {Margin} from './Margin';
 
 
 export const App = () => (
@@ -97,6 +98,13 @@ export const App = () => (
       <Issue66 isOpened />
       <p>Closed by default</p>
       <Issue66 isOpened={false} />
+    </section>
+
+    <section className="section">
+      <h2>
+        Margin in Content
+      </h2>
+      <Margin />
     </section>
 
     <section className="section">
