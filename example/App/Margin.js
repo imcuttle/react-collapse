@@ -26,7 +26,8 @@ export class Margin extends React.PureComponent {
         </div>
 
         <Collapse isOpened={isOpened}>
-          <div style={{backgroundColor: 'red', marginTop: 100, height: 100}}/>
+          <div style={{backgroundColor: 'red', marginTop: 100, marginBottom: 200, height: 100}} />
+          <div style={{backgroundColor: 'green', marginTop: 100, marginBottom: 200, height: 100}} />
         </Collapse>
       </div>
     );

@@ -18,6 +18,18 @@ const css = {
   content: 'ReactCollapse--content'
 };
 
+function calcMarginHeight(child, propKey = 'margin-top') {
+  let marginHeight = 0;
+  if (child.computedStyleMap) {
+    const map = child.computedStyleMap();
+    marginHeight += map.get(propKey).value;
+  } else if (global.getComputedStyle) {
+    const map = global.getComputedStyle(child);
+    marginHeight += parseFloat(map[propKey]);
+  }
+  return marginHeight;
+}
+
 
 export class Collapse extends React.PureComponent {
   static propTypes = {
@@ -150,25 +162,13 @@ export class Collapse extends React.PureComponent {
 
   getTo = () => {
     const {fixedHeight} = this.props;
+    console.log('height', this.content.clientHeight + this.getMarginHeight());
     return (fixedHeight > -1) ? fixedHeight : this.content.clientHeight + this.getMarginHeight();
   };
 
   getMarginHeight() {
-    const {children} = this.content;
-    let sumMarginHeight = 0;
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      let marginHeight = 0;
-      if (child.computedStyleMap) {
-        const map = child.computedStyleMap();
-        marginHeight += map.get('margin-top').value + map.get('margin-bottom').value;
-      } else if (global.getComputedStyle) {
-        const map = global.getComputedStyle(child);
-        marginHeight += parseFloat(map.marginTop) + parseFloat(map.marginBottom);
-      }
-      sumMarginHeight += marginHeight;
-    }
-    return sumMarginHeight;
+    const {firstElementChild, lastElementChild} = this.content;
+    return calcMarginHeight(firstElementChild, 'margin-top') + calcMarginHeight(lastElementChild, 'margin-bottom');
   }
 
 
